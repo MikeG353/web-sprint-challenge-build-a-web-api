@@ -56,8 +56,9 @@ router.delete('/:id', validateProjectId, (req, res) => {
         })
     })
     .catch(err => {
+        console.log(err)
         res.status(500).json({
-            message: "an error occured while removing the projectf rom the db"
+            message: "an error occured while removing the project from the db"
         })
     })
 })

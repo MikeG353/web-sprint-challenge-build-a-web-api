@@ -35,7 +35,7 @@ router.post('/:id', validateProjectId, validateNewAction, (req, res) => {
     })
 })
 
-router.put('/:id', validateActionId, validateNewAction, (req, res) => {
+router.put('/:id', validateActionId, validateUpdatedAction, (req, res) => {
     actions.update(req.action.id, req.body)
     .then(action => {
         res.status(200).json(action)
@@ -48,16 +48,33 @@ router.put('/:id', validateActionId, validateNewAction, (req, res) => {
     })
 })
 
+router.delete('/:id', validateActionId, (req, res) => {
+    actions.remove(req.action.id)
+    .then(success => {
+        res.status(200).json({
+            message: `action id: ${req.action.id} was deleted`
+        })
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({
+            message: "an error occured while removing the action from the db"
+        })
+
+    })
+})
+
 function validateActionId(req, res, next) {
     const {id} = req.params;
     actions.get(id)
     .then(action => {
         if (action) {
             req.action = action;
+            console.log(action)
             next();
         } else {
             res.status(404).json({
-                message: `an action with id:${id} does nto exist`
+                message: `an action with id:${id} does not exist`
             })
         }
     })
@@ -82,6 +99,24 @@ function validateNewAction(req, res, next) {
             })
         } else {
             req.body.project_id = req.project.id || req.action.project_id
+            next()
+        }
+    }
+}
+
+function validateUpdatedAction(req, res, next) {
+    const body = req.body;
+    if (!body || body === {}) {
+        res.status(400).json({
+            message: "missing action data"
+        })
+    } else {
+        if (!body.notes || !body.description) {
+            res.status(400).json({
+                message: "Updated actions require both a notes and description field"
+            })
+        } else {
+            req.body.project_id = req.action.project_id
             next()
         }
     }
