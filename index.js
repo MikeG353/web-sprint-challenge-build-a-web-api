@@ -12,3 +12,11 @@ I need this code, but don't know where, perhaps should make some middleware, don
 
 Go code!
 */
+require('dotenv').config({path:__dirname+'/./..env'});
+const server = require('./server.js');
+// const port = 4000;
+const port = process.env.PORT || 4000;
+// EACCESS error when trying to use the dotenv module
+server.listen(port, () => {
+    console.log(`\n *** Server is listening on port: ${port} *** \n`);
+});
